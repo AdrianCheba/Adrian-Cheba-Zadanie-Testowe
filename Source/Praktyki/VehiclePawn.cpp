@@ -22,6 +22,13 @@ AVehiclePawn::AVehiclePawn()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+
+	BootRear = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM_Porsche_911_GT3_R_Rear_Boot"));
+	BootRear->SetupAttachment(GetMesh(), FName("BootRearSocket"));
+
+	BumperFront = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SM_Porsche_911_GT3_R_Front_Bumper"));
+	BumperFront->SetupAttachment(GetMesh(), FName("BumperFrontSocket"));
+
 }
 
 void AVehiclePawn::Tick(float DeltaTime)

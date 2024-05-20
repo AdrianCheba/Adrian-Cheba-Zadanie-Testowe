@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "ChaosWheeledVehicleMovementComponent.h" 
 #include "InputActionValue.h"
+#include "Components/AudioComponent.h"
 
 AVehiclePawn::AVehiclePawn()
 {
@@ -22,10 +23,20 @@ AVehiclePawn::AVehiclePawn()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+
+	EngineSound = CreateDefaultSubobject<UAudioComponent>(TEXT("Engine Sound"));
+	EngineSound->SetupAttachment(GetMesh());
+
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
 {
+	UChaosWheeledVehicleMovementComponent* vehicleComponent = Cast<UChaosWheeledVehicleMovementComponent>(GetVehicleMovementComponent());
+
+	if (!vehicleComponent)
+		return;
+
+	EngineSound->SetFloatParameter(FName("RPM"), vehicleComponent->GetEngineRotationSpeed());
 }
 
 void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -33,12 +44,8 @@ void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	if (auto PlayerController = Cast<APlayerController>(Controller))
-	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
 			Subsystem->AddMappingContext(InputMapping, 0);
-		}
-	}
 
 	UEnhancedInputComponent* input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	input->BindAction(HandBrakeAction, ETriggerEvent::Triggered, this, &AVehiclePawn::OnHandBrakePressed);

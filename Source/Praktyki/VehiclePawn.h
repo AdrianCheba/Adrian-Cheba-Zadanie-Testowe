@@ -26,6 +26,9 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UAudioComponent* EngineSound;
+
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")

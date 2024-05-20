@@ -26,55 +26,6 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* BootRear;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* BumperFront;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* BumperRear;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* DiffuserBack;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* DoorLeft;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* DoorRight;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* FendreLeft;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* FenderRight;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* HoodFront;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* SpoilerBack;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* WheelBackLeft;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* WheelBackRight;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* WheelFrontLeft;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* WheelFrontRight;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* WingMirrorLeft;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* WingMirrorRight;
-
-
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")

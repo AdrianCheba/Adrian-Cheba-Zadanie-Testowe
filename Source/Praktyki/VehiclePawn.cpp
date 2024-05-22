@@ -181,23 +181,23 @@ void AVehiclePawn::DecreasedSmokeExhaust()
 void AVehiclePawn::SwitchCamera()
 {
 	ActiveCameraIndex = (ActiveCameraIndex + 1) % 3;
+	FRotator NewControlRotation = Controller->GetControlRotation();
 
 	switch (ActiveCameraIndex)
 	{
 	case 0:
 		Camera1->SetActive(true);
-		Camera2->SetActive(false);
 		Camera3->SetActive(false);
+		NewControlRotation.Yaw = GetActorRotation().Yaw;
+		Controller->SetControlRotation(NewControlRotation);
 		break;
 	case 1:
 		Camera2->SetActive(true);
 		Camera1->SetActive(false);
-		Camera3->SetActive(false);
 		break;
 	case 2:
 		Camera3->SetActive(true);
 		Camera2->SetActive(false);
-		Camera1->SetActive(false);
 		break;
 	}
 }

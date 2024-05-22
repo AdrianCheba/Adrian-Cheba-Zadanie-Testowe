@@ -24,8 +24,14 @@ AVehiclePawn::AVehiclePawn()
 	SpringArm->SetRelativeRotation(FRotator(-10, 0, 0));
 	SpringArm->bUsePawnControlRotation = true;
 
-	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	Camera->SetupAttachment(SpringArm);
+	Camera1 = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
+	Camera1->SetupAttachment(SpringArm);
+
+	Camera2 = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera2"));
+	Camera2->SetupAttachment(GetMesh(), FName("Camera2_Socket"));
+
+	Camera3 = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera3"));
+	Camera3->SetupAttachment(GetMesh(), FName("Camera3_Socket"));
 
 	EngineSound = CreateDefaultSubobject<UAudioComponent>(TEXT("Engine Sound"));
 	EngineSound->SetupAttachment(GetMesh());
@@ -47,6 +53,8 @@ AVehiclePawn::AVehiclePawn()
 
 void AVehiclePawn::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+
 	UChaosWheeledVehicleMovementComponent* vehicleComponent = Cast<UChaosWheeledVehicleMovementComponent>(GetVehicleMovementComponent());
 
 	if (!vehicleComponent)
@@ -66,6 +74,11 @@ void AVehiclePawn::BeginPlay()
 {
 	Super::BeginPlay();
 	TurnRearLights(false);
+
+	Camera1->SetActive(true);
+	Camera2->SetActive(false);
+	Camera3->SetActive(false);
+	ActiveCameraIndex = 0;
 }
 
 void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -87,6 +100,7 @@ void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	input->BindAction(LookUpDownAction, ETriggerEvent::Triggered, this, &AVehiclePawn::LookUpDown);
 	input->BindAction(SteeringAction, ETriggerEvent::Triggered, this, &AVehiclePawn::Steering);
 	input->BindAction(SteeringAction, ETriggerEvent::Completed, this, &AVehiclePawn::SteeringReleased);
+	input->BindAction(SwitchCameraAction, ETriggerEvent::Triggered, this, &AVehiclePawn::SwitchCamera);
 }
 
 
@@ -162,4 +176,29 @@ void AVehiclePawn::DecreasedSmokeExhaust()
 {
 	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 30);
 	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 30);
+}
+
+void AVehiclePawn::SwitchCamera()
+{
+	ActiveCameraIndex = (ActiveCameraIndex + 1) % 3;
+	FRotator NewControlRotation = Controller->GetControlRotation();
+
+	switch (ActiveCameraIndex)
+	{
+	case 0:
+		Camera1->SetActive(true);
+		Camera3->SetActive(false);
+		NewControlRotation.Yaw = GetActorRotation().Yaw;
+		Controller->SetControlRotation(NewControlRotation);
+		break;
+	case 1:
+		Camera2->SetActive(true);
+		Camera1->SetActive(false);
+		break;
+		
+	case 2:
+		Camera3->SetActive(true);
+		Camera2->SetActive(false);
+		break;
+	}
 }

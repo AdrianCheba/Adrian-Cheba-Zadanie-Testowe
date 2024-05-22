@@ -9,4 +9,7 @@ UWheelFront::UWheelFront()
 	bAffectedByEngine = true;
 	bAffectedBySteering = true;
 	MaxSteerAngle = 45;
+	FrictionForceMultiplier = 2.5;
+	bABSEnabled = true;
+	bTractionControlEnabled = true;
 }

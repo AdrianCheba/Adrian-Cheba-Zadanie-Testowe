@@ -23,7 +23,13 @@ public:
 	class USpringArmComponent* SpringArm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UCameraComponent* Camera;
+	class UCameraComponent* Camera1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UCameraComponent* Camera2;
+
+	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite)
+	class UCameraComponent* Camera3;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -66,10 +72,12 @@ protected:
 	class UInputAction* SteeringAction;	
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
-	class UInputAction* ToggleCameraAction;	
+	class UInputAction* SwitchCameraAction;
 
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* RestartAction;
+
+	int ActiveCameraIndex;
 
 	
 private:
@@ -86,4 +94,5 @@ private:
 	void TurnRearLights(bool value);
 	void IncreasedSmokeExhaust();
 	void DecreasedSmokeExhaust();
+	void SwitchCamera();
 };

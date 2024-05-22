@@ -29,13 +29,11 @@ AVehiclePawn::AVehiclePawn()
 	EngineSound->SetupAttachment(GetMesh());
 
 	RearLeftLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Left Light"));
-	RearLeftLight->SetupAttachment(GetMesh());
-	RearLeftLight->SetRelativeLocation(FVector(-210, -80, 70));
+	RearLeftLight->SetupAttachment(GetMesh(), FName("Light_Rear_Left"));
 	RearLeftLight->LightColor = FColor::Red;
 
 	RearRightLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Right Light"));
-	RearRightLight->SetupAttachment(GetMesh());
-	RearRightLight->SetRelativeLocation(FVector(-210, 80, 70));
+	RearRightLight->SetupAttachment(GetMesh(), FName("Light_Rear_Right"));
 	RearRightLight->LightColor = FColor::Red;
 }
 

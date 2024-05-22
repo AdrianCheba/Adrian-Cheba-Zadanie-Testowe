@@ -12,6 +12,8 @@
 #include "InputActionValue.h"
 #include "Components/AudioComponent.h"
 #include "Components/PointLightComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 AVehiclePawn::AVehiclePawn()
 {
@@ -29,14 +31,18 @@ AVehiclePawn::AVehiclePawn()
 	EngineSound->SetupAttachment(GetMesh());
 
 	RearLeftLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Left Light"));
-	RearLeftLight->SetupAttachment(GetMesh());
-	RearLeftLight->SetRelativeLocation(FVector(-210, -80, 70));
+	RearLeftLight->SetupAttachment(GetMesh(), FName("Light_Rear_Left"));
 	RearLeftLight->LightColor = FColor::Red;
 
 	RearRightLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Right Light"));
-	RearRightLight->SetupAttachment(GetMesh());
-	RearRightLight->SetRelativeLocation(FVector(-210, 80, 70));
+	RearRightLight->SetupAttachment(GetMesh(), FName("Light_Rear_Right"));
 	RearRightLight->LightColor = FColor::Red;
+
+	NS_ExhaustLeft = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Left VFX"));
+	NS_ExhaustLeft->SetupAttachment(GetMesh(), FName("Exhaust_Left"));
+
+	NS_ExhaustRight = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Right VFX"));
+	NS_ExhaustRight->SetupAttachment(GetMesh(), FName("Exhaust_Right"));
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
@@ -46,7 +52,14 @@ void AVehiclePawn::Tick(float DeltaTime)
 	if (!vehicleComponent)
 		return;
 
-	EngineSound->SetFloatParameter(FName("RPM"), vehicleComponent->GetEngineRotationSpeed());
+	float rpm = vehicleComponent->GetEngineRotationSpeed();
+
+	EngineSound->SetFloatParameter(FName("RPM"), rpm);
+
+	if (rpm > 1500 && rpm < 4500)
+		IncreasedSmokeExhaust();
+	else
+		DecreasedSmokeExhaust();
 }
 
 void AVehiclePawn::BeginPlay()
@@ -137,4 +150,16 @@ void AVehiclePawn::TurnRearLights(bool value)
 {
 	RearLeftLight->SetVisibility(value);
 	RearRightLight->SetVisibility(value);
+}
+
+void AVehiclePawn::IncreasedSmokeExhaust()
+{
+	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 300);
+	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 300);
+}
+
+void AVehiclePawn::DecreasedSmokeExhaust()
+{
+	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 30);
+	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 30);
 }

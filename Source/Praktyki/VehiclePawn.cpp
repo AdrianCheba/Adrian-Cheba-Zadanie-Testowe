@@ -195,6 +195,7 @@ void AVehiclePawn::SwitchCamera()
 		Camera2->SetActive(true);
 		Camera1->SetActive(false);
 		break;
+		
 	case 2:
 		Camera3->SetActive(true);
 		Camera2->SetActive(false);

@@ -17,6 +17,7 @@ public:
 	AVehiclePawn();
 
 	virtual void Tick(float DeltaTime) override;
+	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USpringArmComponent* SpringArm;
@@ -28,6 +29,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UAudioComponent* EngineSound;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UPointLightComponent* RearLeftLight;	
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UPointLightComponent* RearRightLight;
 
 protected:
 	
@@ -60,13 +67,15 @@ protected:
 
 	
 private:
-	void MoveForward(const FInputActionValue& Value);
-	void MoveBackward(const FInputActionValue& Value);
-	void LookAround(const FInputActionValue& Value);
-	void LookUpDown(const FInputActionValue& Value);
-	void Steering(const FInputActionValue& Value);
+	void MoveForward(const FInputActionValue& value);
+	void OnBrakePressed(const FInputActionValue& value);
+	void OnBrakeReleased(const FInputActionValue& value);
+	void LookAround(const FInputActionValue& value);
+	void LookUpDown(const FInputActionValue& value);
+	void Steering(const FInputActionValue& value);
 	void SteeringReleased();
 	void OnHandBrakePressed();
 	void OnHandBrakeReleased();
 	void OnThrottleReleased();
+	void TurnRearLights(bool value);
 };

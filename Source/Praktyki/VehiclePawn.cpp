@@ -11,6 +11,7 @@
 #include "ChaosWheeledVehicleMovementComponent.h" 
 #include "InputActionValue.h"
 #include "Components/AudioComponent.h"
+#include "Components/PointLightComponent.h"
 
 AVehiclePawn::AVehiclePawn()
 {
@@ -27,6 +28,15 @@ AVehiclePawn::AVehiclePawn()
 	EngineSound = CreateDefaultSubobject<UAudioComponent>(TEXT("Engine Sound"));
 	EngineSound->SetupAttachment(GetMesh());
 
+	RearLeftLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Left Light"));
+	RearLeftLight->SetupAttachment(GetMesh());
+	RearLeftLight->SetRelativeLocation(FVector(-210, -80, 70));
+	RearLeftLight->LightColor = FColor::Red;
+
+	RearRightLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Right Light"));
+	RearRightLight->SetupAttachment(GetMesh());
+	RearRightLight->SetRelativeLocation(FVector(-210, 80, 70));
+	RearRightLight->LightColor = FColor::Red;
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
@@ -37,6 +47,12 @@ void AVehiclePawn::Tick(float DeltaTime)
 		return;
 
 	EngineSound->SetFloatParameter(FName("RPM"), vehicleComponent->GetEngineRotationSpeed());
+}
+
+void AVehiclePawn::BeginPlay()
+{
+	Super::BeginPlay();
+	TurnRearLights(false);
 }
 
 void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -52,7 +68,8 @@ void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	input->BindAction(HandBrakeAction, ETriggerEvent::Completed, this, &AVehiclePawn::OnHandBrakeReleased);
 	input->BindAction(ThrottleAction, ETriggerEvent::Started, this, &AVehiclePawn::MoveForward);
 	input->BindAction(ThrottleAction, ETriggerEvent::Completed, this, &AVehiclePawn::OnThrottleReleased);
-	input->BindAction(BrakeAction, ETriggerEvent::Triggered, this, &AVehiclePawn::MoveBackward);
+	input->BindAction(BrakeAction, ETriggerEvent::Triggered, this, &AVehiclePawn::OnBrakePressed);
+	input->BindAction(BrakeAction, ETriggerEvent::Completed, this, &AVehiclePawn::OnBrakeReleased);
 	input->BindAction(LookAroundAction, ETriggerEvent::Triggered, this, &AVehiclePawn::LookAround);
 	input->BindAction(LookUpDownAction, ETriggerEvent::Triggered, this, &AVehiclePawn::LookUpDown);
 	input->BindAction(SteeringAction, ETriggerEvent::Triggered, this, &AVehiclePawn::Steering);
@@ -61,29 +78,36 @@ void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 
 
-void AVehiclePawn::MoveForward(const FInputActionValue& Value)
+void AVehiclePawn::MoveForward(const FInputActionValue& value)
 {
-	GetVehicleMovementComponent()->SetThrottleInput(Value.Get<float>());
+	GetVehicleMovementComponent()->SetThrottleInput(value.Get<float>());
 }
 
-void AVehiclePawn::MoveBackward(const FInputActionValue& Value)
+void AVehiclePawn::OnBrakePressed(const FInputActionValue& value)
 {
-	GetVehicleMovementComponent()->SetBrakeInput(Value.Get<float>() / 1.5);
+	GetVehicleMovementComponent()->SetBrakeInput(value.Get<float>() / 1.5);
+	TurnRearLights(true);
 }
 
-void AVehiclePawn::LookAround(const FInputActionValue& Value)
+void AVehiclePawn::OnBrakeReleased(const FInputActionValue& value)
 {
-	AddControllerYawInput(Value.Get<float>());
+	GetVehicleMovementComponent()->SetBrakeInput(0);
+	TurnRearLights(false);
 }
 
-void AVehiclePawn::LookUpDown(const FInputActionValue& Value)
+void AVehiclePawn::LookAround(const FInputActionValue& value)
 {
-	AddControllerPitchInput(Value.Get<float>() / -10);
+	AddControllerYawInput(value.Get<float>());
 }
 
-void AVehiclePawn::Steering(const FInputActionValue& Value)
+void AVehiclePawn::LookUpDown(const FInputActionValue& value)
 {
-	GetVehicleMovementComponent()->SetSteeringInput(Value.Get<float>());
+	AddControllerPitchInput(value.Get<float>() / -10);
+}
+
+void AVehiclePawn::Steering(const FInputActionValue& value)
+{
+	GetVehicleMovementComponent()->SetSteeringInput(value.Get<float>());
 }
 
 void AVehiclePawn::SteeringReleased()
@@ -94,14 +118,23 @@ void AVehiclePawn::SteeringReleased()
 void AVehiclePawn::OnHandBrakePressed()
 {
 	GetVehicleMovementComponent()->SetHandbrakeInput(true);
+	TurnRearLights(true);
 }
 
 void AVehiclePawn::OnHandBrakeReleased()
 {
 	GetVehicleMovementComponent()->SetHandbrakeInput(false);
+	TurnRearLights(false);
 }
 
 void AVehiclePawn::OnThrottleReleased()
 {
 	GetVehicleMovementComponent()->SetThrottleInput(0);
+
+}
+
+void AVehiclePawn::TurnRearLights(bool value)
+{
+	RearLeftLight->SetVisibility(value);
+	RearRightLight->SetVisibility(value);
 }

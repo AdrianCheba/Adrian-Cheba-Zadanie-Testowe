@@ -7,4 +7,6 @@ UWheelRear::UWheelRear()
 {
 	AxleType = EAxleType::Rear;
 	bAffectedByHandbrake = true;
+	FrictionForceMultiplier = 2.5;
+	bTractionControlEnabled = true;
 }

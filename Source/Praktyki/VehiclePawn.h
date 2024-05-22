@@ -36,6 +36,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UPointLightComponent* RearRightLight;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UNiagaraComponent* NS_ExhaustRight;	
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	class UNiagaraComponent* NS_ExhaustLeft;
+
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -78,4 +84,6 @@ private:
 	void OnHandBrakeReleased();
 	void OnThrottleReleased();
 	void TurnRearLights(bool value);
+	void IncreasedSmokeExhaust();
+	void DecreasedSmokeExhaust();
 };

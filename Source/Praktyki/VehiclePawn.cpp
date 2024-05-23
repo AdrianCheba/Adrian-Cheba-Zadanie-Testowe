@@ -28,10 +28,10 @@ AVehiclePawn::AVehiclePawn()
 	Camera1->SetupAttachment(SpringArm);
 
 	Camera2 = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera2"));
-	Camera2->SetupAttachment(GetMesh(), FName("Camera2_Socket"));
+	Camera2->SetupAttachment(GetMesh(), FName("CarInteriorGameplayCamera"));
 
 	Camera3 = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera3"));
-	Camera3->SetupAttachment(GetMesh(), FName("Camera3_Socket"));
+	Camera3->SetupAttachment(GetMesh(), FName("CarAttachedSpectatorWingCamera"));
 
 	EngineSound = CreateDefaultSubobject<UAudioComponent>(TEXT("Engine Sound"));
 	EngineSound->SetupAttachment(GetMesh());

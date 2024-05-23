@@ -37,12 +37,6 @@ public:
 	class UAudioComponent* EngineSound;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UPointLightComponent* RearLeftLight;	
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UPointLightComponent* RearRightLight;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UNiagaraComponent* NS_ExhaustRight;	
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

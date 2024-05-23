@@ -36,19 +36,11 @@ AVehiclePawn::AVehiclePawn()
 	EngineSound = CreateDefaultSubobject<UAudioComponent>(TEXT("Engine Sound"));
 	EngineSound->SetupAttachment(GetMesh());
 
-	RearLeftLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Left Light"));
-	RearLeftLight->SetupAttachment(GetMesh(), FName("Light_Rear_Left"));
-	RearLeftLight->LightColor = FColor::Red;
-
-	RearRightLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Right Light"));
-	RearRightLight->SetupAttachment(GetMesh(), FName("Light_Rear_Right"));
-	RearRightLight->LightColor = FColor::Red;
-
 	NS_ExhaustLeft = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Left VFX"));
-	NS_ExhaustLeft->SetupAttachment(GetMesh(), FName("Exhaust_Left"));
+	NS_ExhaustLeft->SetupAttachment(GetMesh(), FName("VfxMainExhaust"));
 
 	NS_ExhaustRight = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Right VFX"));
-	NS_ExhaustRight->SetupAttachment(GetMesh(), FName("Exhaust_Right"));
+	NS_ExhaustRight->SetupAttachment(GetMesh(), FName("VfxSecondExhaust"));
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
@@ -162,20 +154,18 @@ void AVehiclePawn::OnThrottleReleased()
 
 void AVehiclePawn::TurnRearLights(bool value)
 {
-	RearLeftLight->SetVisibility(value);
-	RearRightLight->SetVisibility(value);
 }
 
 void AVehiclePawn::IncreasedSmokeExhaust()
 {
-	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 300);
-	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 300);
+	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 500);
+	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 500);
 }
 
 void AVehiclePawn::DecreasedSmokeExhaust()
 {
-	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 30);
-	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 30);
+	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 100);
+	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 100);
 }
 
 void AVehiclePawn::SwitchCamera()

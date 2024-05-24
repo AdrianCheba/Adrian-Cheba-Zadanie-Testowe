@@ -52,7 +52,16 @@ public:
 	class UNiagaraComponent* NS_ExhaustLeft;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
-	UStaticMeshComponent* SteeringWheelMesh;
+	class UStaticMeshComponent* SteeringWheelMesh;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UPointLightComponent* RearLeftLight;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UPointLightComponent* RearCenterLight;	
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UPointLightComponent* RearRightLight;
 
 protected:
 	
@@ -88,7 +97,6 @@ protected:
 
 	float SteeringInput;
 	int ActiveCameraIndex;
-
 	
 private:
 	void MoveForward(const FInputActionValue& value);

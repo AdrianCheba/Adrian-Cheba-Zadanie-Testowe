@@ -61,6 +61,18 @@ AVehiclePawn::AVehiclePawn()
 
 	SteeringWheelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SteeringWheel"));
 	SteeringWheelMesh->SetupAttachment(GetMesh(), FName(TEXT("SteeringWheel")));
+
+	RearLeftLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("RearLeftLight"));
+	RearLeftLight->SetupAttachment(GetMesh(), FName(TEXT("RearLeftLight")));
+	RearLeftLight->LightColor = FColor::Red;
+	
+	RearRightLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("RearRightLight"));
+	RearRightLight->SetupAttachment(GetMesh(), FName(TEXT("RearRightLight")));
+	RearRightLight->LightColor = FColor::Red;
+	
+	RearCenterLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("RearCenterLight"));
+	RearCenterLight->SetupAttachment(GetMesh(), FName(TEXT("RearCenterLight")));
+	RearCenterLight->LightColor = FColor::Red;
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
@@ -142,7 +154,7 @@ void AVehiclePawn::LookAround(const FInputActionValue& value)
 
 void AVehiclePawn::LookUpDown(const FInputActionValue& value)
 {
-	AddControllerPitchInput(value.Get<float>() / -10);
+	AddControllerPitchInput(value.Get<float>() / -7);
 }
 
 void AVehiclePawn::InteriorCameraLook()
@@ -185,18 +197,21 @@ void AVehiclePawn::OnThrottleReleased()
 
 void AVehiclePawn::TurnRearLights(bool value)
 {
+	RearLeftLight->SetVisibility(value);
+	RearCenterLight->SetVisibility(value);
+	RearRightLight->SetVisibility(value);
 }
 
 void AVehiclePawn::IncreasedSmokeExhaust()
 {
-	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 500);
-	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 500);
+	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 350);
+	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 350);
 }
 
 void AVehiclePawn::DecreasedSmokeExhaust()
 {
-	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 100);
-	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 100);
+	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 30);
+	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 30);
 }
 
 void AVehiclePawn::SwitchCamera()

@@ -8,8 +8,10 @@ UWheelFront::UWheelFront()
 	AxleType = EAxleType::Front;
 	bAffectedByEngine = true;
 	bAffectedBySteering = true;
-	MaxSteerAngle = 45;
+	MaxSteerAngle = 40;
 	FrictionForceMultiplier = 2.5;
 	bABSEnabled = true;
 	bTractionControlEnabled = true;
+	SlipThreshold = 35;
+	CorneringStiffness = 1500;
 }

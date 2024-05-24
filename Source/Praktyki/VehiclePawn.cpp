@@ -24,31 +24,55 @@ AVehiclePawn::AVehiclePawn()
 	SpringArm->SetRelativeRotation(FRotator(-10, 0, 0));
 	SpringArm->bUsePawnControlRotation = true;
 
+	SpringArm2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm2"));
+	SpringArm2->SetupAttachment(GetMesh());
+	SpringArm2->TargetArmLength = 700;
+	SpringArm2->SetRelativeLocation(FVector(0, 0, 140));
+	SpringArm2->SetRelativeRotation(FRotator(-10, 0, 0));
+	SpringArm2->bUsePawnControlRotation = true;
+
+	SpringArm3 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm3"));
+	SpringArm3->SetupAttachment(RootComponent);
+	SpringArm3->TargetArmLength = 0;
+	SpringArm3->SetRelativeLocation(FVector(0, 0, 0));
+	SpringArm3->SetRelativeRotation(FRotator(0, 0, 0));
+	SpringArm3->bUsePawnControlRotation = false;
+	
 	Camera1 = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
 	Camera1->SetupAttachment(SpringArm);
 
 	Camera2 = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera2"));
-	Camera2->SetupAttachment(GetMesh(), FName("CarInteriorGameplayCamera"));
+	Camera2->SetupAttachment(SpringArm2);
 
 	Camera3 = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera3"));
-	Camera3->SetupAttachment(GetMesh(), FName("CarAttachedSpectatorWingCamera"));
+	Camera3->SetupAttachment(GetMesh(), FName("CarAttachedSpectatorWingCamera"));	
+	
+	Camera4 = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera4"));
+	Camera4->SetupAttachment(SpringArm3);
 
 	EngineSound = CreateDefaultSubobject<UAudioComponent>(TEXT("Engine Sound"));
 	EngineSound->SetupAttachment(GetMesh());
 
-	RearLeftLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Left Light"));
-	RearLeftLight->SetupAttachment(GetMesh(), FName("Light_Rear_Left"));
-	RearLeftLight->LightColor = FColor::Red;
-
-	RearRightLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("Rear Right Light"));
-	RearRightLight->SetupAttachment(GetMesh(), FName("Light_Rear_Right"));
-	RearRightLight->LightColor = FColor::Red;
-
 	NS_ExhaustLeft = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Left VFX"));
-	NS_ExhaustLeft->SetupAttachment(GetMesh(), FName("Exhaust_Left"));
+	NS_ExhaustLeft->SetupAttachment(GetMesh(), FName("VfxMainExhaust"));
 
 	NS_ExhaustRight = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Right VFX"));
-	NS_ExhaustRight->SetupAttachment(GetMesh(), FName("Exhaust_Right"));
+	NS_ExhaustRight->SetupAttachment(GetMesh(), FName("VfxSecondExhaust"));
+
+	SteeringWheelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SteeringWheel"));
+	SteeringWheelMesh->SetupAttachment(GetMesh(), FName(TEXT("SteeringWheel")));
+
+	RearLeftLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("RearLeftLight"));
+	RearLeftLight->SetupAttachment(GetMesh(), FName(TEXT("RearLeftLight")));
+	RearLeftLight->LightColor = FColor::Red;
+	
+	RearRightLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("RearRightLight"));
+	RearRightLight->SetupAttachment(GetMesh(), FName(TEXT("RearRightLight")));
+	RearRightLight->LightColor = FColor::Red;
+	
+	RearCenterLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("RearCenterLight"));
+	RearCenterLight->SetupAttachment(GetMesh(), FName(TEXT("RearCenterLight")));
+	RearCenterLight->LightColor = FColor::Red;
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
@@ -68,16 +92,15 @@ void AVehiclePawn::Tick(float DeltaTime)
 		IncreasedSmokeExhaust();
 	else
 		DecreasedSmokeExhaust();
+
+	SteeringInput = vehicleComponent->GetSteeringInput();
+	UpdateSteeringWheelRotation(SteeringInput);
 }
 
 void AVehiclePawn::BeginPlay()
 {
 	Super::BeginPlay();
 	TurnRearLights(false);
-
-	Camera1->SetActive(true);
-	Camera2->SetActive(false);
-	Camera3->SetActive(false);
 	ActiveCameraIndex = 0;
 }
 
@@ -101,6 +124,8 @@ void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	input->BindAction(SteeringAction, ETriggerEvent::Triggered, this, &AVehiclePawn::Steering);
 	input->BindAction(SteeringAction, ETriggerEvent::Completed, this, &AVehiclePawn::SteeringReleased);
 	input->BindAction(SwitchCameraAction, ETriggerEvent::Triggered, this, &AVehiclePawn::SwitchCamera);
+	input->BindAction(InteriorCameraLookAction, ETriggerEvent::Triggered, this, &AVehiclePawn::InteriorCameraLook);
+	input->BindAction(InteriorCameraLookAction, ETriggerEvent::Completed, this, &AVehiclePawn::InteriorCameraLookReleased);
 }
 
 
@@ -129,7 +154,17 @@ void AVehiclePawn::LookAround(const FInputActionValue& value)
 
 void AVehiclePawn::LookUpDown(const FInputActionValue& value)
 {
-	AddControllerPitchInput(value.Get<float>() / -10);
+	AddControllerPitchInput(value.Get<float>() / -7);
+}
+
+void AVehiclePawn::InteriorCameraLook()
+{
+	SpringArm3->bUsePawnControlRotation = true;
+}
+
+void AVehiclePawn::InteriorCameraLookReleased()
+{
+	SpringArm3->bUsePawnControlRotation = false;
 }
 
 void AVehiclePawn::Steering(const FInputActionValue& value)
@@ -163,13 +198,14 @@ void AVehiclePawn::OnThrottleReleased()
 void AVehiclePawn::TurnRearLights(bool value)
 {
 	RearLeftLight->SetVisibility(value);
+	RearCenterLight->SetVisibility(value);
 	RearRightLight->SetVisibility(value);
 }
 
 void AVehiclePawn::IncreasedSmokeExhaust()
 {
-	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 300);
-	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 300);
+	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 350);
+	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 350);
 }
 
 void AVehiclePawn::DecreasedSmokeExhaust()
@@ -180,25 +216,39 @@ void AVehiclePawn::DecreasedSmokeExhaust()
 
 void AVehiclePawn::SwitchCamera()
 {
-	ActiveCameraIndex = (ActiveCameraIndex + 1) % 3;
+	ActiveCameraIndex = (ActiveCameraIndex + 1) % 4;
 	FRotator NewControlRotation = Controller->GetControlRotation();
 
 	switch (ActiveCameraIndex)
 	{
 	case 0:
 		Camera1->SetActive(true);
-		Camera3->SetActive(false);
+		Camera4->SetActive(false);
 		NewControlRotation.Yaw = GetActorRotation().Yaw;
+		NewControlRotation.Pitch = GetActorRotation().Pitch;
 		Controller->SetControlRotation(NewControlRotation);
 		break;
 	case 1:
 		Camera2->SetActive(true);
 		Camera1->SetActive(false);
+		NewControlRotation.Yaw = GetActorRotation().Yaw;
+		NewControlRotation.Pitch = GetActorRotation().Pitch;
+		Controller->SetControlRotation(NewControlRotation);
 		break;
 		
 	case 2:
 		Camera3->SetActive(true);
 		Camera2->SetActive(false);
+		break;	
+	case 3:
+		Camera4->SetActive(true);
+		Camera3->SetActive(false);
 		break;
 	}
+}
+
+void AVehiclePawn::UpdateSteeringWheelRotation(float steeringInput)
+{
+	FRotator NewRotation = FRotator(0.f, 0.0f, SteeringInput * 45.f);
+	SteeringWheelMesh->SetRelativeRotation(NewRotation);
 }

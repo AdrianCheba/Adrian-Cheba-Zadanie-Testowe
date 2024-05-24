@@ -23,13 +23,22 @@ public:
 	class USpringArmComponent* SpringArm;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USpringArmComponent* SpringArm2;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class USpringArmComponent* SpringArm3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UCameraComponent* Camera1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UCameraComponent* Camera2;
 
-	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UCameraComponent* Camera3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UCameraComponent* Camera4;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -37,16 +46,22 @@ public:
 	class UAudioComponent* EngineSound;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UPointLightComponent* RearLeftLight;	
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UPointLightComponent* RearRightLight;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UNiagaraComponent* NS_ExhaustRight;	
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UNiagaraComponent* NS_ExhaustLeft;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* SteeringWheelMesh;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UPointLightComponent* RearLeftLight;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UPointLightComponent* RearCenterLight;	
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UPointLightComponent* RearRightLight;
 
 protected:
 	
@@ -76,9 +91,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* RestartAction;
+	
+	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
+	class UInputAction* InteriorCameraLookAction;
 
+	float SteeringInput;
 	int ActiveCameraIndex;
-
 	
 private:
 	void MoveForward(const FInputActionValue& value);
@@ -86,6 +104,8 @@ private:
 	void OnBrakeReleased(const FInputActionValue& value);
 	void LookAround(const FInputActionValue& value);
 	void LookUpDown(const FInputActionValue& value);
+	void InteriorCameraLook();
+	void InteriorCameraLookReleased();
 	void Steering(const FInputActionValue& value);
 	void SteeringReleased();
 	void OnHandBrakePressed();
@@ -95,4 +115,5 @@ private:
 	void IncreasedSmokeExhaust();
 	void DecreasedSmokeExhaust();
 	void SwitchCamera();
+	void UpdateSteeringWheelRotation(float steeringInput);
 };

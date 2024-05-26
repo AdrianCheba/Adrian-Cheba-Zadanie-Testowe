@@ -73,6 +73,18 @@ AVehiclePawn::AVehiclePawn()
 	RearCenterLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("RearCenterLight"));
 	RearCenterLight->SetupAttachment(GetMesh(), FName(TEXT("RearCenterLight")));
 	RearCenterLight->LightColor = FColor::Red;
+
+	NS_RR_Trail = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Rear Right Trail"));
+	NS_RR_Trail->SetupAttachment(GetMesh(), FName(TEXT("WheelRearRightTireSocket")));	
+	
+	NS_RL_Trail = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Rear Left Trail"));
+	NS_RL_Trail->SetupAttachment(GetMesh(), FName(TEXT("WheelRearLeftTireSocket")));
+
+	NS_FL_Trail = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Front Left Trail"));
+	NS_FL_Trail->SetupAttachment(GetMesh(), FName(TEXT("WheelFrontLeftTireSocket")));
+	
+	NS_FR_Trail = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Front Right Trail"));
+	NS_FR_Trail->SetupAttachment(GetMesh(), FName(TEXT("WheelFrontRightTireSocket")));
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
@@ -139,12 +151,22 @@ void AVehiclePawn::OnBrakePressed(const FInputActionValue& value)
 {
 	GetVehicleMovementComponent()->SetBrakeInput(value.Get<float>() / 1.5);
 	TurnRearLights(true);
+	
+	if (GetVehicleMovementComponent()->GetForwardSpeed() < 20)
+		return;
+
+	if(value.Get<float>() > 0  && !NS_FR_Trail->IsActive())
+		ActivateTrails(false);
+
+	if (value.Get<float>() == 0 && NS_FR_Trail->IsActive())
+		DeactivateTrails();
 }
 
 void AVehiclePawn::OnBrakeReleased(const FInputActionValue& value)
 {
 	GetVehicleMovementComponent()->SetBrakeInput(0);
 	TurnRearLights(false);
+	DeactivateTrails();
 }
 
 void AVehiclePawn::LookAround(const FInputActionValue& value)
@@ -181,12 +203,14 @@ void AVehiclePawn::OnHandBrakePressed()
 {
 	GetVehicleMovementComponent()->SetHandbrakeInput(true);
 	TurnRearLights(true);
+	ActivateTrails(true);
 }
 
 void AVehiclePawn::OnHandBrakeReleased()
 {
 	GetVehicleMovementComponent()->SetHandbrakeInput(false);
 	TurnRearLights(false);
+	DeactivateTrails();
 }
 
 void AVehiclePawn::OnThrottleReleased()
@@ -251,4 +275,24 @@ void AVehiclePawn::UpdateSteeringWheelRotation(float steeringInput)
 {
 	FRotator NewRotation = FRotator(0.f, 0.0f, SteeringInput * 45.f);
 	SteeringWheelMesh->SetRelativeRotation(NewRotation);
+}
+
+void AVehiclePawn::ActivateTrails(bool isHandbrake)
+{
+	NS_RR_Trail->Activate();
+	NS_RL_Trail->Activate();
+
+	if (isHandbrake)
+		return;
+
+	NS_FR_Trail->Activate();
+	NS_FL_Trail->Activate();
+}
+
+void AVehiclePawn::DeactivateTrails()
+{
+	NS_RR_Trail->Deactivate();
+	NS_RL_Trail->Deactivate();
+	NS_FR_Trail->Deactivate();
+	NS_FL_Trail->Deactivate();
 }

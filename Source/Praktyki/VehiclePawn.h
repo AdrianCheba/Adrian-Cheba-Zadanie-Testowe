@@ -63,6 +63,18 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UPointLightComponent* RearRightLight;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UNiagaraComponent* NS_RR_Trail;	
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UNiagaraComponent* NS_RL_Trail;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UNiagaraComponent* NS_FR_Trail;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UNiagaraComponent* NS_FL_Trail;
+
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -116,4 +128,6 @@ private:
 	void DecreasedSmokeExhaust();
 	void SwitchCamera();
 	void UpdateSteeringWheelRotation(float steeringInput);
+	void ActivateTrails(bool isHandbrake);
+	void DeactivateTrails();
 };

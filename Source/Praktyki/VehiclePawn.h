@@ -74,6 +74,48 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UNiagaraComponent* NS_FL_Trail;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* BumperFront;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* Body;	
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* HoodFront;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* FenderRight;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* FenderLeft;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* DoorRight;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* DoorLeft;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* Window;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* BootRear;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* BumperRear;	
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	class UStaticMeshComponent* SpoilerBack;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Material")
+	class UMaterialInterface* DamageMaterial;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Material")
+	class UMaterialInterface* DamageLightMaterial;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Material")
+	class UMaterialInterface* DamageWindowMaterial;
 
 protected:
 	
@@ -109,6 +151,7 @@ protected:
 
 	float SteeringInput;
 	int ActiveCameraIndex;
+	int DamageTake = 0;
 	
 private:
 	void MoveForward(const FInputActionValue& value);
@@ -130,4 +173,9 @@ private:
 	void UpdateSteeringWheelRotation(float steeringInput);
 	void ActivateTrails(bool isHandbrake);
 	void DeactivateTrails();
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 };

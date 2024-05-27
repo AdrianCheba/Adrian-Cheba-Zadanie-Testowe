@@ -14,6 +14,7 @@
 #include "Components/PointLightComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Components/DecalComponent.h"
 
 AVehiclePawn::AVehiclePawn()
 {
@@ -85,6 +86,43 @@ AVehiclePawn::AVehiclePawn()
 	
 	NS_FR_Trail = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Front Right Trail"));
 	NS_FR_Trail->SetupAttachment(GetMesh(), FName(TEXT("WheelFrontRightTireSocket")));
+
+	BumperFront = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Bumper Front"));
+	BumperFront->SetupAttachment(GetMesh(), FName(TEXT("bumper_front")));
+	
+	Body = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
+	Body->SetupAttachment(GetMesh(), FName(TEXT("SK_Porsche_911_GT3_R_Bone")));
+	
+	HoodFront = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HoodFront"));
+	HoodFront->SetupAttachment(GetMesh(), FName(TEXT("hood_front")));
+	
+	FenderLeft = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FenderLeft"));
+	FenderLeft->SetupAttachment(GetMesh(), FName(TEXT("fender_left")));
+
+	FenderRight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FenderRight"));
+	FenderRight->SetupAttachment(GetMesh(), FName(TEXT("fender_right")));
+
+	DoorRight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorRight"));
+	DoorRight->SetupAttachment(GetMesh(), FName(TEXT("door_right")));
+	
+	DoorLeft = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorLeft"));
+	DoorLeft->SetupAttachment(GetMesh(), FName(TEXT("door_left")));
+	
+	Window = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Window"));
+	Window->SetupAttachment(GetMesh(), FName(TEXT("SK_Porsche_911_GT3_R_Bone")));	
+	
+	BootRear = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BootRear"));
+	BootRear->SetupAttachment(GetMesh(), FName(TEXT("boot_rear")));
+	
+	BumperRear = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BumperRear"));
+	BumperRear->SetupAttachment(GetMesh(), FName(TEXT("bumper_rear")));
+	
+	SpoilerBack = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SpoilerBack"));
+	SpoilerBack->SetupAttachment(GetMesh(), FName(TEXT("spoiler_back")));
+
+	DamageMaterial = CreateDefaultSubobject<UMaterialInstance>("DamageMaterial");
+	DamageLightMaterial = CreateDefaultSubobject<UMaterialInstance>("DamageLightMaterial");
+	DamageWindowMaterial = CreateDefaultSubobject<UMaterialInstance>("DamageWindowMaterial");
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
@@ -107,6 +145,8 @@ void AVehiclePawn::Tick(float DeltaTime)
 
 	SteeringInput = vehicleComponent->GetSteeringInput();
 	UpdateSteeringWheelRotation(SteeringInput);
+
+	GetMesh()->SetNotifyRigidBodyCollision(true);
 }
 
 void AVehiclePawn::BeginPlay()
@@ -114,6 +154,8 @@ void AVehiclePawn::BeginPlay()
 	Super::BeginPlay();
 	TurnRearLights(false);
 	ActiveCameraIndex = 0;
+	GetMesh()->OnComponentHit.AddDynamic(this, &AVehiclePawn::OnHit);
+	this->OnTakeAnyDamage.AddDynamic(this, &AVehiclePawn::OnTakeDamage);
 }
 
 void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -295,4 +337,44 @@ void AVehiclePawn::DeactivateTrails()
 	NS_RL_Trail->Deactivate();
 	NS_FR_Trail->Deactivate();
 	NS_FL_Trail->Deactivate();
+}
+
+void AVehiclePawn::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	OnTakeDamage(this, 10, nullptr, GetController(), this);
+}
+
+void AVehiclePawn::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	if (DamageTake == 0) 
+	{
+		BumperFront->SetMaterial(0, DamageMaterial);
+		HoodFront->SetMaterial(0, DamageMaterial);
+	}
+	else if (DamageTake >= 1 && DamageTake <= 3) 
+	{
+		FenderLeft->SetMaterial(0, DamageMaterial);
+		FenderRight->SetMaterial(0, DamageMaterial);
+		FenderLeft->SetMaterial(2, DamageLightMaterial);
+		FenderRight->SetMaterial(3, DamageLightMaterial);
+	}
+	else if (DamageTake > 3 && DamageTake <= 6)
+	{
+		Body->SetMaterial(0, DamageMaterial);
+		Body->SetMaterial(5, DamageWindowMaterial);
+		DoorLeft->SetMaterial(0, DamageMaterial);
+		DoorRight->SetMaterial(0, DamageMaterial);	
+		DoorLeft->SetMaterial(3, DamageWindowMaterial);
+		DoorRight->SetMaterial(3, DamageWindowMaterial);
+		Window->SetMaterial(0, DamageWindowMaterial);
+	}
+	else if (DamageTake > 7) 
+	{
+		BumperRear->SetMaterial(0, DamageMaterial);
+		BumperRear->SetMaterial(2, DamageLightMaterial);
+		BootRear->SetMaterial(0, DamageMaterial);
+		SpoilerBack->SetMaterial(0, DamageMaterial);
+	}
+
+	DamageTake++;
 }

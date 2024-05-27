@@ -14,6 +14,7 @@
 #include "Components/PointLightComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Components/BoxComponent.h"
 
 AVehiclePawn::AVehiclePawn()
 {
@@ -107,6 +108,8 @@ void AVehiclePawn::Tick(float DeltaTime)
 
 	SteeringInput = vehicleComponent->GetSteeringInput();
 	UpdateSteeringWheelRotation(SteeringInput);
+
+	GetMesh()->SetNotifyRigidBodyCollision(true);
 }
 
 void AVehiclePawn::BeginPlay()
@@ -114,6 +117,7 @@ void AVehiclePawn::BeginPlay()
 	Super::BeginPlay();
 	TurnRearLights(false);
 	ActiveCameraIndex = 0;
+	GetMesh()->OnComponentHit.AddDynamic(this, &AVehiclePawn::OnHit);
 }
 
 void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -295,4 +299,9 @@ void AVehiclePawn::DeactivateTrails()
 	NS_RL_Trail->Deactivate();
 	NS_FR_Trail->Deactivate();
 	NS_FL_Trail->Deactivate();
+}
+
+void AVehiclePawn::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Kolizja z: %s"), *OtherActor->GetName());
 }

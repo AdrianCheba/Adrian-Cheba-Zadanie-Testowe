@@ -75,6 +75,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	class UNiagaraComponent* NS_FL_Trail;
 
+
+
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -130,4 +132,7 @@ private:
 	void UpdateSteeringWheelRotation(float steeringInput);
 	void ActivateTrails(bool isHandbrake);
 	void DeactivateTrails();
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };

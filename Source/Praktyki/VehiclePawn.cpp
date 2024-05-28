@@ -15,6 +15,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "Components/DecalComponent.h"
+#include "PraktykiGameModeBase.h"
 
 AVehiclePawn::AVehiclePawn()
 {
@@ -374,6 +375,14 @@ void AVehiclePawn::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamag
 		BumperRear->SetMaterial(2, DamageLightMaterial);
 		BootRear->SetMaterial(0, DamageMaterial);
 		SpoilerBack->SetMaterial(0, DamageMaterial);
+		APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
+
+		if (GameMode) 
+		{
+			GameMode->DestroyedCar(this);
+			DetachFromControllerPendingDestroy();
+		}
+
 	}
 
 	DamageTake++;

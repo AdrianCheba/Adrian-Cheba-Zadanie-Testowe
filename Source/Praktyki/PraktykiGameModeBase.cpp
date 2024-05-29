@@ -3,6 +3,10 @@
 
 #include "PraktykiGameModeBase.h"
 
+void APraktykiGameModeBase::FinishedLap(APawn* Car)
+{
+}
+
 void APraktykiGameModeBase::DestroyedCar(APawn* Car)
 {
 }

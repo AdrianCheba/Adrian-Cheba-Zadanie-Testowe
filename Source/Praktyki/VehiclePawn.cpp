@@ -224,7 +224,7 @@ void AVehiclePawn::LookAround(const FInputActionValue& value)
 
 void AVehiclePawn::LookUpDown(const FInputActionValue& value)
 {
-	AddControllerPitchInput(value.Get<float>() / -7);
+	AddControllerPitchInput(value.Get<float>() / -10);
 }
 
 void AVehiclePawn::InteriorCameraLook()

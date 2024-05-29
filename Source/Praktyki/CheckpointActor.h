@@ -14,6 +14,8 @@ class PRAKTYKI_API ACheckpointActor : public AActor
 public:	
 	ACheckpointActor();
 
+	bool IsDeactivated;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -22,5 +24,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UBoxComponent* CollisonBox;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 };

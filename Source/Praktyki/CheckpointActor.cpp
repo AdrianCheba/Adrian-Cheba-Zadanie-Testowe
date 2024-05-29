@@ -2,25 +2,44 @@
 
 
 #include "CheckpointActor.h"
+#include "Components/BoxComponent.h"
+#include "Engine/Engine.h"
+#include "PraktykiGameModeBase.h"
 
 // Sets default values
 ACheckpointActor::ACheckpointActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	CollisonBox = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
+	CollisonBox->SetCollisionProfileName("Trigger");
+	RootComponent = CollisonBox;
+
+	CollisonBox->OnComponentBeginOverlap.AddDynamic(this, &ACheckpointActor::OnOverlapBegin);
 }
 
 void ACheckpointActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void ACheckpointActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+void ACheckpointActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Overrlap"));
+	IsDeactivated = true;
+
+	APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
+	APawn* OtherActorPawn = Cast<APawn>(OtherActor);
+
+	if (GameMode && OtherActorPawn)
+		GameMode->FinishedLap(OtherActorPawn);
+
+	RootComponent->Deactivate();
 }
 

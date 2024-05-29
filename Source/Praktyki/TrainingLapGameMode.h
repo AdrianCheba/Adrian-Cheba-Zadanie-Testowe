@@ -15,5 +15,10 @@ class PRAKTYKI_API ATrainingLapGameMode : public APraktykiGameModeBase
 	GENERATED_BODY()
 
 public:
+	virtual void FinishedLap(APawn* Car) override;
 	virtual void DestroyedCar(APawn* Car) override;
+
+private:
+	void EndGame(bool bIsPlayerWinner);
+	
 };

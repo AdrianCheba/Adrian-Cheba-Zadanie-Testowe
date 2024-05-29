@@ -13,5 +13,6 @@ class PRAKTYKI_API APraktykiGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
+	virtual void FinishedLap(APawn* Car);
 	virtual void DestroyedCar(APawn* Car);
 };

@@ -16,9 +16,13 @@
 #include "NiagaraComponent.h"
 #include "Components/DecalComponent.h"
 #include "PraktykiGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 
 AVehiclePawn::AVehiclePawn()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->TargetArmLength = 600;
@@ -181,6 +185,7 @@ void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	input->BindAction(SwitchCameraAction, ETriggerEvent::Triggered, this, &AVehiclePawn::SwitchCamera);
 	input->BindAction(InteriorCameraLookAction, ETriggerEvent::Triggered, this, &AVehiclePawn::InteriorCameraLook);
 	input->BindAction(InteriorCameraLookAction, ETriggerEvent::Completed, this, &AVehiclePawn::InteriorCameraLookReleased);
+	input->BindAction(RestartAction, ETriggerEvent::Triggered, this, &AVehiclePawn::RestartLevel);
 }
 
 
@@ -340,8 +345,16 @@ void AVehiclePawn::DeactivateTrails()
 	NS_FL_Trail->Deactivate();
 }
 
+void AVehiclePawn::RestartLevel()
+{
+	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+}
+
 void AVehiclePawn::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (OtherActor->GetName() == TEXT("BP_Car_C_0"))
+		return;
+
 	OnTakeDamage(this, 10, nullptr, GetController(), this);
 }
 

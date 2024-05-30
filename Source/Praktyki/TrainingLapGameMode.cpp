@@ -5,6 +5,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/Controller.h"
 #include "CheckpointActor.h"
+#include "TimerManager.h"
 
 void ATrainingLapGameMode::FinishedLap(APawn* Car)
 {
@@ -32,6 +33,12 @@ void ATrainingLapGameMode::DestroyedCar(APawn* Car)
 	}
 }
 
+void ATrainingLapGameMode::LapManager(APawn* Car, float CurrentLapTime)
+{
+	CurrentLapTime = GetWorld()->GetTimeSeconds();
+	UE_LOG(LogTemp, Warning, TEXT("%f"), CurrentLapTime);
+}
+
 void ATrainingLapGameMode::EndGame(bool bIsPlayerWinner)
 {
 	for (AController* Controller : TActorRange<AController>(GetWorld())) 
@@ -39,4 +46,9 @@ void ATrainingLapGameMode::EndGame(bool bIsPlayerWinner)
 		bool bIsWinner = Controller->IsPlayerController() == bIsPlayerWinner;
 		Controller->GameHasEnded(Controller->GetPawn(), bIsWinner);
 	}
+}
+
+void ATrainingLapGameMode::TimeUp()
+{
+	EndGame(false);
 }

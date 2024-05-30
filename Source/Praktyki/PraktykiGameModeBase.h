@@ -15,4 +15,7 @@ class PRAKTYKI_API APraktykiGameModeBase : public AGameModeBase
 public:
 	virtual void FinishedLap(APawn* Car);
 	virtual void DestroyedCar(APawn* Car);
+	virtual void TimeUp();
+	virtual void LapManager(APawn* Car, float CurrentLapTime);
+
 };

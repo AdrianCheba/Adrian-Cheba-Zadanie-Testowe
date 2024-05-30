@@ -46,10 +46,10 @@ public:
 	class UAudioComponent* EngineSound;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UNiagaraComponent* NS_ExhaustRight;	
+	class UNiagaraComponent* ExhaustRight;	
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UNiagaraComponent* NS_ExhaustLeft;
+	class UNiagaraComponent* ExhaustLeft;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* SteeringWheelMesh;
@@ -120,6 +120,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 DamageTake;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float CurrentLapTime;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float MaxLapTime;
+	
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -152,6 +158,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* InteriorCameraLookAction;
 
+	FTimerHandle MaxLapTimeHandle;
+
 	float SteeringInput;
 	int ActiveCameraIndex;
 	
@@ -177,6 +185,7 @@ private:
 	void ActivateTrails(bool isHandbrake);
 	void DeactivateTrails();
 	void RestartLevel();
+	void TimeUp();
 
 	UFUNCTION()
 		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

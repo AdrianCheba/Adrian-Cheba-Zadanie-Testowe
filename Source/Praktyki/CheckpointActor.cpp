@@ -9,8 +9,6 @@
 // Sets default values
 ACheckpointActor::ACheckpointActor()
 {
-	PrimaryActorTick.bCanEverTick = true;
-
 	CollisonBox = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 	CollisonBox->SetCollisionProfileName("Trigger");
 	RootComponent = CollisonBox;
@@ -31,9 +29,7 @@ void ACheckpointActor::Tick(float DeltaTime)
 
 void ACheckpointActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Overrlap"));
 	IsDeactivated = true;
-
 	APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
 	APawn* OtherActorPawn = Cast<APawn>(OtherActor);
 

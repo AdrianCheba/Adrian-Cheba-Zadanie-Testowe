@@ -16,7 +16,6 @@ class PRAKTYKI_API ARacePlayerController : public APlayerController
 
 public:
 	virtual void GameHasEnded(AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
-	void CheckEngin() ;
 
 private:
 

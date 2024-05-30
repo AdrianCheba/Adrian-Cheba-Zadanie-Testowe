@@ -117,6 +117,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Material")
 	class UMaterialInterface* DamageWindowMaterial;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 DamageTake;
+
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -151,7 +154,7 @@ protected:
 
 	float SteeringInput;
 	int ActiveCameraIndex;
-	int DamageTake = 0;
+	
 	
 private:
 	void MoveForward(const FInputActionValue& value);

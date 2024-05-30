@@ -12,7 +12,7 @@ void ARacePlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 	if (bIsWinner)
 	{
 		UUserWidget* WinScreen = CreateWidget(this, WinScreenClass);
-		if (WinScreen)
+		if (WinScreen) 
 			WinScreen->AddToViewport();
 	}
 	else
@@ -24,3 +24,4 @@ void ARacePlayerController::GameHasEnded(AActor* EndGameFocus, bool bIsWinner)
 
 	GetWorldTimerManager().SetTimer(RestartTimer, this, &APlayerController::RestartLevel, RestartDelay);
 }
+

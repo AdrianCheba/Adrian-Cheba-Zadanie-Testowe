@@ -17,6 +17,7 @@ void ATrainingLapGameMode::FinishedLap(APawn* Car)
 	}
 
 	EndGame(true);
+	Car->DetachFromControllerPendingDestroy();
 }
 
 void ATrainingLapGameMode::DestroyedCar(APawn* Car)
@@ -24,8 +25,11 @@ void ATrainingLapGameMode::DestroyedCar(APawn* Car)
 	Super::DestroyedCar(Car);
 
 	APlayerController* PlayerController = Cast<APlayerController>(Car->GetController());
-	if (PlayerController)
+	if (PlayerController) 
+	{
 		EndGame(false);
+		Car->DetachFromControllerPendingDestroy();
+	}
 }
 
 void ATrainingLapGameMode::EndGame(bool bIsPlayerWinner)

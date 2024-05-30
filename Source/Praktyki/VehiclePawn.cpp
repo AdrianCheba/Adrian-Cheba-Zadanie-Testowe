@@ -18,6 +18,7 @@
 #include "PraktykiGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "Blueprint/UserWidget.h"
 
 AVehiclePawn::AVehiclePawn()
 {
@@ -128,6 +129,8 @@ AVehiclePawn::AVehiclePawn()
 	DamageMaterial = CreateDefaultSubobject<UMaterialInstance>("DamageMaterial");
 	DamageLightMaterial = CreateDefaultSubobject<UMaterialInstance>("DamageLightMaterial");
 	DamageWindowMaterial = CreateDefaultSubobject<UMaterialInstance>("DamageWindowMaterial");
+
+	DamageTake = 0;
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
@@ -372,7 +375,7 @@ void AVehiclePawn::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamag
 		FenderLeft->SetMaterial(2, DamageLightMaterial);
 		FenderRight->SetMaterial(3, DamageLightMaterial);
 	}
-	else if (DamageTake > 3 && DamageTake <= 6)
+	else if (DamageTake > 3 && DamageTake <= 5)
 	{
 		Body->SetMaterial(0, DamageMaterial);
 		Body->SetMaterial(5, DamageWindowMaterial);
@@ -381,8 +384,15 @@ void AVehiclePawn::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamag
 		DoorLeft->SetMaterial(3, DamageWindowMaterial);
 		DoorRight->SetMaterial(3, DamageWindowMaterial);
 		Window->SetMaterial(0, DamageWindowMaterial);
+
+		if (UChaosWheeledVehicleMovementComponent* VehicleMovement = Cast<UChaosWheeledVehicleMovementComponent>(GetVehicleMovement()))
+		{
+			VehicleMovement->EngineSetup.MaxTorque = 300;
+			NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 500);
+			NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 500);
+		}
 	}
-	else if (DamageTake > 7) 
+	else if (DamageTake > 6) 
 	{
 		BumperRear->SetMaterial(0, DamageMaterial);
 		BumperRear->SetMaterial(2, DamageLightMaterial);
@@ -393,9 +403,8 @@ void AVehiclePawn::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamag
 		if (GameMode) 
 		{
 			GameMode->DestroyedCar(this);
-			DetachFromControllerPendingDestroy();
+			GetVehicleMovementComponent()->SetThrottleInput(0);
 		}
-
 	}
 
 	DamageTake++;

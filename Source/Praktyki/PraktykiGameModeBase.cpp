@@ -11,11 +11,11 @@ void APraktykiGameModeBase::DestroyedCar(APawn* Car)
 {
 }
 
-void APraktykiGameModeBase::TimeUp()
+void APraktykiGameModeBase::TimeUp(APawn* Car)
 {
 }
 
-void APraktykiGameModeBase::LapManager(APawn* Car, float CurrentLapTime)
+void APraktykiGameModeBase::LapManager(APawn* Car)
 {
 }
 

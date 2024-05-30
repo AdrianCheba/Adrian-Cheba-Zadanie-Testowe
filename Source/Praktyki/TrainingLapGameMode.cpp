@@ -6,6 +6,8 @@
 #include "GameFramework/Controller.h"
 #include "CheckpointActor.h"
 #include "TimerManager.h"
+#include "Components/AudioComponent.h"
+
 
 void ATrainingLapGameMode::FinishedLap(APawn* Car)
 {
@@ -18,7 +20,15 @@ void ATrainingLapGameMode::FinishedLap(APawn* Car)
 	}
 
 	EndGame(true);
-	Car->DetachFromControllerPendingDestroy();
+	TArray<UAudioComponent*> AudioComponents;
+	Car->GetComponents<UAudioComponent>(AudioComponents);
+	for (UAudioComponent* AudioComponent : AudioComponents)
+	{
+		if (AudioComponent)
+		{
+			AudioComponent->SetVolumeMultiplier(0.0f);
+		}
+	}
 }
 
 void ATrainingLapGameMode::DestroyedCar(APawn* Car)
@@ -29,14 +39,21 @@ void ATrainingLapGameMode::DestroyedCar(APawn* Car)
 	if (PlayerController) 
 	{
 		EndGame(false);
-		Car->DetachFromControllerPendingDestroy();
+		TArray<UAudioComponent*> AudioComponents;
+		Car->GetComponents<UAudioComponent>(AudioComponents);
+		for (UAudioComponent* AudioComponent : AudioComponents)
+		{
+			if (AudioComponent)
+			{
+				AudioComponent->SetVolumeMultiplier(0.0f);
+			}
+		}
 	}
 }
 
-void ATrainingLapGameMode::LapManager(APawn* Car, float CurrentLapTime)
+void ATrainingLapGameMode::LapManager(APawn* Car)
 {
-	CurrentLapTime = GetWorld()->GetTimeSeconds();
-	UE_LOG(LogTemp, Warning, TEXT("%f"), CurrentLapTime);
+
 }
 
 void ATrainingLapGameMode::EndGame(bool bIsPlayerWinner)
@@ -45,10 +62,20 @@ void ATrainingLapGameMode::EndGame(bool bIsPlayerWinner)
 	{
 		bool bIsWinner = Controller->IsPlayerController() == bIsPlayerWinner;
 		Controller->GameHasEnded(Controller->GetPawn(), bIsWinner);
+		GetWorld()->GetWorldSettings()->SetTimeDilation(0.0f);
 	}
 }
 
-void ATrainingLapGameMode::TimeUp()
+void ATrainingLapGameMode::TimeUp(APawn* Car)
 {
 	EndGame(false);
+	TArray<UAudioComponent*> AudioComponents;
+	Car->GetComponents<UAudioComponent>(AudioComponents);
+	for (UAudioComponent* AudioComponent : AudioComponents)
+	{
+		if (AudioComponent)
+		{
+			AudioComponent->SetVolumeMultiplier(0.0f);
+		}
+	}
 }

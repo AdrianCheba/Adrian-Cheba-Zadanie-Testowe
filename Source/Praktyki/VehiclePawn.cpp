@@ -157,7 +157,7 @@ void AVehiclePawn::Tick(float DeltaTime)
 
 	if (GameMode)
 	{
-		GameMode->LapManager(this, CurrentLapTime);
+		GameMode->LapManager(this);
 	}
 	
 }
@@ -366,17 +366,15 @@ void AVehiclePawn::TimeUp()
 
 	if (GameMode)
 	{
-		GameMode->TimeUp();
-		DetachFromControllerPendingDestroy();
+		GameMode->TimeUp(this);
 	}
 }
 
 void AVehiclePawn::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor->GetName() == TEXT("BP_Car_C_0"))
+	if (OtherActor->GetName() == TEXT("BP_Car_C_0") || OtherActor->ActorHasTag(FName(TEXT("Track"))))
 		return;
-	if (OtherActor->ActorHasTag(FName(TEXT("Track"))))
-		UE_LOG(LogTemp, Warning, TEXT("Track"));
+
 	OnTakeDamage(this, 10, nullptr, GetController(), this);
 }
 

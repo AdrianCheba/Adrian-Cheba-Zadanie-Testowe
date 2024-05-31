@@ -26,10 +26,10 @@ void ATrainingLapGameMode::FinishedLap(APawn* Car)
 
 		LastLapTime = CurrentLapTime - LastLapTime;
 
-		if (CurrentLap == 2)
+		if(CurrentLap == 1)
 			BestLapTime = LastLapTime;
-		else
-			if (BestLapTime > LastLapTime)
+		else 
+			if(BestLapTime > LastLapTime)
 				BestLapTime = LastLapTime;
 
 		CurrentLap++;

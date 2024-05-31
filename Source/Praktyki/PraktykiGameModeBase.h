@@ -16,6 +16,6 @@ public:
 	virtual void FinishedLap(APawn* Car);
 	virtual void DestroyedCar(APawn* Car);
 	virtual void TimeUp(APawn* Car);
-	virtual void LapManager(APawn* Car, float Laps);
+	virtual void LapManager(APawn* Car, float Laps, float LapTime);
 
 };

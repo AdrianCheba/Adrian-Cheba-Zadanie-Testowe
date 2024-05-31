@@ -152,6 +152,10 @@ void AVehiclePawn::Tick(float DeltaTime)
 	UpdateSteeringWheelRotation(SteeringInput);
 
 	CurrentLapTime = GetWorld()->TimeSeconds;
+
+	APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
+	if (GameMode)
+		GameMode->LapManager(this, NumberOfLaps, CurrentLapTime);
 }
 
 void AVehiclePawn::BeginPlay()
@@ -163,11 +167,6 @@ void AVehiclePawn::BeginPlay()
 	this->OnTakeAnyDamage.AddDynamic(this, &AVehiclePawn::OnTakeDamage);
 	GetMesh()->SetNotifyRigidBodyCollision(true);
 	GetWorldTimerManager().SetTimer(MaxLapTimeHandle, this, &AVehiclePawn::TimeUp, MaxLapTime);
-
-	APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
-	if (GameMode)
-		GameMode->LapManager(this, NumberOfLaps);
-
 }
 
 void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

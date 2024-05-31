@@ -17,7 +17,7 @@ class PRAKTYKI_API ATrainingLapGameMode : public APraktykiGameModeBase
 public:
 	virtual void FinishedLap(APawn* Car) override;
 	virtual void DestroyedCar(APawn* Car) override;
-	virtual void LapManager(APawn* Car, float Laps) override;
+	virtual void LapManager(APawn* Car, float Laps, float LapTime) override;
 	virtual void TimeUp(APawn* Car) override;
 
 	float MaxLapTime;
@@ -25,8 +25,13 @@ public:
 	float CurrentLap = 1;
 	float CurrentLapTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float LastLapTime = 0;	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float BestLapTime = 0;
+
 private:
 	void EndGame(bool bIsPlayerWinner);
 	void MuteAll(APawn* Car);
-
 };

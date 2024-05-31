@@ -24,10 +24,23 @@ void ATrainingLapGameMode::FinishedLap(APawn* Car)
 		for (ACheckpointActor* CheckPoint : TActorRange<ACheckpointActor>(GetWorld()))
 			CheckPoint->ActivateCheckpoint();
 
+		LastLapTime = CurrentLapTime - LastLapTime;
+
+		if (CurrentLap == 2)
+			BestLapTime = LastLapTime;
+		else
+			if (BestLapTime > LastLapTime)
+				BestLapTime = LastLapTime;
+
 		CurrentLap++;
 	}
 	else 
 	{
+		LastLapTime = CurrentLapTime - LastLapTime;
+
+		if (BestLapTime > LastLapTime || CurrentLap == 1)
+			BestLapTime = LastLapTime;
+
 		EndGame(true);
 		MuteAll(Car);
 	}
@@ -47,9 +60,10 @@ void ATrainingLapGameMode::DestroyedCar(APawn* Car)
 	}
 }
 
-void ATrainingLapGameMode::LapManager(APawn* Car, float Laps)
+void ATrainingLapGameMode::LapManager(APawn* Car, float Laps, float LapTime)
 {
 	NumberOfLaps = Laps;
+	CurrentLapTime = LapTime;
 }
 
 void ATrainingLapGameMode::EndGame(bool bIsPlayerWinner)

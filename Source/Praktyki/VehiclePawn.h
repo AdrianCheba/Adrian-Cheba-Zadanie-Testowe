@@ -126,6 +126,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float MaxLapTime;
 	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float NumberOfLaps;
+	
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")

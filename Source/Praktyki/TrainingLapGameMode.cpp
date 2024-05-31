@@ -19,7 +19,18 @@ void ATrainingLapGameMode::FinishedLap(APawn* Car)
 			return;
 	}
 
-	EndGame(true);
+	if (CurrentLap == NumberOfLaps)
+		EndGame(true);
+	else 
+	{
+		CurrentLap++;
+		for (ACheckpointActor* CheckPoint : TActorRange<ACheckpointActor>(GetWorld()))
+		{
+			if (CheckPoint->IsDeactivated)
+				CheckPoint->ActivateCheckpoint();
+		}
+	}
+
 	TArray<UAudioComponent*> AudioComponents;
 	Car->GetComponents<UAudioComponent>(AudioComponents);
 	for (UAudioComponent* AudioComponent : AudioComponents)
@@ -51,9 +62,9 @@ void ATrainingLapGameMode::DestroyedCar(APawn* Car)
 	}
 }
 
-void ATrainingLapGameMode::LapManager(APawn* Car)
+void ATrainingLapGameMode::LapManager(APawn* Car, float Laps)
 {
-
+	NumberOfLaps = Laps;
 }
 
 void ATrainingLapGameMode::EndGame(bool bIsPlayerWinner)

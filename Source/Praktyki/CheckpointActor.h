@@ -16,6 +16,8 @@ public:
 
 	bool IsDeactivated;
 
+	void ActivateCheckpoint();
+
 protected:
 	virtual void BeginPlay() override;
 

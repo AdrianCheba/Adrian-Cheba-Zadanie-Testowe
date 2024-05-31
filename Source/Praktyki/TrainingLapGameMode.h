@@ -17,8 +17,12 @@ class PRAKTYKI_API ATrainingLapGameMode : public APraktykiGameModeBase
 public:
 	virtual void FinishedLap(APawn* Car) override;
 	virtual void DestroyedCar(APawn* Car) override;
-	virtual void LapManager(APawn* Car) override;
+	virtual void LapManager(APawn* Car, float Laps) override;
 	virtual void TimeUp(APawn* Car) override;
+
+	float MaxLapTime;
+	float NumberOfLaps;
+	float CurrentLap = 1;
 
 private:
 	void EndGame(bool bIsPlayerWinner);

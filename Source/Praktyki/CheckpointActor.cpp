@@ -16,6 +16,12 @@ ACheckpointActor::ACheckpointActor()
 	CollisonBox->OnComponentBeginOverlap.AddDynamic(this, &ACheckpointActor::OnOverlapBegin);
 }
 
+void ACheckpointActor::ActivateCheckpoint()
+{
+	IsDeactivated = true;
+	RootComponent->Activate();
+}
+
 void ACheckpointActor::BeginPlay()
 {
 	Super::BeginPlay();

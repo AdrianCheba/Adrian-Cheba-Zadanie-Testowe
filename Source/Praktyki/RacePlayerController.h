@@ -17,6 +17,9 @@ class PRAKTYKI_API ARacePlayerController : public APlayerController
 public:
 	virtual void GameHasEnded(AActor* EndGameFocus = nullptr, bool bIsWinner = false) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxLapTime;
+
 private:
 
 	UPROPERTY(EditAnywhere)

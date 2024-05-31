@@ -15,7 +15,7 @@ void APraktykiGameModeBase::TimeUp(APawn* Car)
 {
 }
 
-void APraktykiGameModeBase::LapManager(APawn* Car)
+void APraktykiGameModeBase::LapManager(APawn* Car, float Laps)
 {
 }
 

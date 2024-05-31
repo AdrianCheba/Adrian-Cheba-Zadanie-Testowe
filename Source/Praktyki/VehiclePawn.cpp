@@ -165,8 +165,11 @@ void AVehiclePawn::BeginPlay()
 	GetWorldTimerManager().SetTimer(MaxLapTimeHandle, this, &AVehiclePawn::TimeUp, MaxLapTime);
 
 	APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
+
 	if (GameMode)
+	{
 		GameMode->LapManager(this, NumberOfLaps);
+	}
 
 }
 
@@ -362,7 +365,9 @@ void AVehiclePawn::TimeUp()
 	APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
 
 	if (GameMode)
+	{
 		GameMode->TimeUp(this);
+	}
 }
 
 void AVehiclePawn::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

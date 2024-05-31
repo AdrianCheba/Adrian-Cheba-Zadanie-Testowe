@@ -23,10 +23,8 @@ public:
 	float MaxLapTime;
 	float NumberOfLaps;
 	float CurrentLap = 1;
-	float CurrentLapTime;
 
 private:
 	void EndGame(bool bIsPlayerWinner);
-	void MuteAll(APawn* Car);
 
 };

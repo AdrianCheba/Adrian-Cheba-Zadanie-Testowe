@@ -18,7 +18,7 @@ ACheckpointActor::ACheckpointActor()
 
 void ACheckpointActor::ActivateCheckpoint()
 {
-	IsDeactivated = true;
+	IsDeactivated = false;
 	RootComponent->Activate();
 }
 

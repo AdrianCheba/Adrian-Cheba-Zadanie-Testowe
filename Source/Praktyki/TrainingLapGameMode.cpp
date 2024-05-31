@@ -19,27 +19,20 @@ void ATrainingLapGameMode::FinishedLap(APawn* Car)
 			return;
 	}
 
-	if (CurrentLap == NumberOfLaps)
-		EndGame(true);
+	if (CurrentLap != NumberOfLaps)
+	{
+		for (ACheckpointActor* CheckPoint : TActorRange<ACheckpointActor>(GetWorld()))
+			CheckPoint->ActivateCheckpoint();
+
+		CurrentLap++;
+	}
 	else 
 	{
-		CurrentLap++;
-		for (ACheckpointActor* CheckPoint : TActorRange<ACheckpointActor>(GetWorld()))
-		{
-			if (CheckPoint->IsDeactivated)
-				CheckPoint->ActivateCheckpoint();
-		}
+		EndGame(true);
+		MuteAll(Car);
 	}
 
-	TArray<UAudioComponent*> AudioComponents;
-	Car->GetComponents<UAudioComponent>(AudioComponents);
-	for (UAudioComponent* AudioComponent : AudioComponents)
-	{
-		if (AudioComponent)
-		{
-			AudioComponent->SetVolumeMultiplier(0.0f);
-		}
-	}
+	
 }
 
 void ATrainingLapGameMode::DestroyedCar(APawn* Car)
@@ -50,15 +43,7 @@ void ATrainingLapGameMode::DestroyedCar(APawn* Car)
 	if (PlayerController) 
 	{
 		EndGame(false);
-		TArray<UAudioComponent*> AudioComponents;
-		Car->GetComponents<UAudioComponent>(AudioComponents);
-		for (UAudioComponent* AudioComponent : AudioComponents)
-		{
-			if (AudioComponent)
-			{
-				AudioComponent->SetVolumeMultiplier(0.0f);
-			}
-		}
+		MuteAll(Car);
 	}
 }
 
@@ -77,9 +62,8 @@ void ATrainingLapGameMode::EndGame(bool bIsPlayerWinner)
 	}
 }
 
-void ATrainingLapGameMode::TimeUp(APawn* Car)
+void ATrainingLapGameMode::MuteAll(APawn* Car)
 {
-	EndGame(false);
 	TArray<UAudioComponent*> AudioComponents;
 	Car->GetComponents<UAudioComponent>(AudioComponents);
 	for (UAudioComponent* AudioComponent : AudioComponents)
@@ -89,4 +73,10 @@ void ATrainingLapGameMode::TimeUp(APawn* Car)
 			AudioComponent->SetVolumeMultiplier(0.0f);
 		}
 	}
+}
+
+void ATrainingLapGameMode::TimeUp(APawn* Car)
+{
+	EndGame(false);
+	MuteAll(Car);
 }

@@ -46,66 +46,66 @@ public:
 	class UAudioComponent* EngineSound;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UNiagaraComponent* NS_ExhaustRight;	
+	class UNiagaraComponent* ExhaustRight;	
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	class UNiagaraComponent* NS_ExhaustLeft;
+	class UNiagaraComponent* ExhaustLeft;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* SteeringWheelMesh;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UPointLightComponent* RearLeftLight;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UPointLightComponent* RearCenterLight;	
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UPointLightComponent* RearRightLight;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UNiagaraComponent* NS_RR_Trail;	
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UNiagaraComponent* NS_RL_Trail;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UNiagaraComponent* NS_FR_Trail;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UNiagaraComponent* NS_FL_Trail;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* BumperFront;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* Body;	
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* HoodFront;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* FenderRight;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* FenderLeft;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* DoorRight;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* DoorLeft;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* Window;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* BootRear;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* BumperRear;	
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	class UStaticMeshComponent* SpoilerBack;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Material")
@@ -117,6 +117,18 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Material")
 	class UMaterialInterface* DamageWindowMaterial;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 DamageTake;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float CurrentLapTime;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float MaxLapTime;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float NumberOfLaps;
+	
 protected:
 	
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
@@ -149,9 +161,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "EnhancedInput")
 	class UInputAction* InteriorCameraLookAction;
 
+	FTimerHandle MaxLapTimeHandle;
+
 	float SteeringInput;
 	int ActiveCameraIndex;
-	int DamageTake = 0;
+	
 	
 private:
 	void MoveForward(const FInputActionValue& value);
@@ -173,9 +187,11 @@ private:
 	void UpdateSteeringWheelRotation(float steeringInput);
 	void ActivateTrails(bool isHandbrake);
 	void DeactivateTrails();
+	void RestartLevel();
+	void TimeUp();
 
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	UFUNCTION()
-	void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+		void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 };

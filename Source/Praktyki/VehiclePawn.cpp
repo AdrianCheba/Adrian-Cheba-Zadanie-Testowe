@@ -15,6 +15,9 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 #include "Components/DecalComponent.h"
+#include "PraktykiGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 
 AVehiclePawn::AVehiclePawn()
 {
@@ -54,12 +57,12 @@ AVehiclePawn::AVehiclePawn()
 	EngineSound = CreateDefaultSubobject<UAudioComponent>(TEXT("Engine Sound"));
 	EngineSound->SetupAttachment(GetMesh());
 
-	NS_ExhaustLeft = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Left VFX"));
-	NS_ExhaustLeft->SetupAttachment(GetMesh(), FName("VfxMainExhaust"));
+	ExhaustLeft = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Left VFX"));
+	ExhaustLeft->SetupAttachment(GetMesh(), FName("VfxMainExhaust"));
 
-	NS_ExhaustRight = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Right VFX"));
-	NS_ExhaustRight->SetupAttachment(GetMesh(), FName("VfxSecondExhaust"));
-
+	ExhaustRight = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Exhaust Right VFX"));
+	ExhaustRight->SetupAttachment(GetMesh(), FName("VfxSecondExhaust"));
+	
 	SteeringWheelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SteeringWheel"));
 	SteeringWheelMesh->SetupAttachment(GetMesh(), FName(TEXT("SteeringWheel")));
 
@@ -123,6 +126,8 @@ AVehiclePawn::AVehiclePawn()
 	DamageMaterial = CreateDefaultSubobject<UMaterialInstance>("DamageMaterial");
 	DamageLightMaterial = CreateDefaultSubobject<UMaterialInstance>("DamageLightMaterial");
 	DamageWindowMaterial = CreateDefaultSubobject<UMaterialInstance>("DamageWindowMaterial");
+
+	DamageTake = 0;
 }
 
 void AVehiclePawn::Tick(float DeltaTime)
@@ -146,7 +151,11 @@ void AVehiclePawn::Tick(float DeltaTime)
 	SteeringInput = vehicleComponent->GetSteeringInput();
 	UpdateSteeringWheelRotation(SteeringInput);
 
-	GetMesh()->SetNotifyRigidBodyCollision(true);
+	CurrentLapTime = GetWorld()->TimeSeconds;
+
+	APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
+	if (GameMode)
+		GameMode->LapManager(this, NumberOfLaps, CurrentLapTime);
 }
 
 void AVehiclePawn::BeginPlay()
@@ -156,6 +165,8 @@ void AVehiclePawn::BeginPlay()
 	ActiveCameraIndex = 0;
 	GetMesh()->OnComponentHit.AddDynamic(this, &AVehiclePawn::OnHit);
 	this->OnTakeAnyDamage.AddDynamic(this, &AVehiclePawn::OnTakeDamage);
+	GetMesh()->SetNotifyRigidBodyCollision(true);
+	GetWorldTimerManager().SetTimer(MaxLapTimeHandle, this, &AVehiclePawn::TimeUp, MaxLapTime);
 }
 
 void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -180,6 +191,7 @@ void AVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	input->BindAction(SwitchCameraAction, ETriggerEvent::Triggered, this, &AVehiclePawn::SwitchCamera);
 	input->BindAction(InteriorCameraLookAction, ETriggerEvent::Triggered, this, &AVehiclePawn::InteriorCameraLook);
 	input->BindAction(InteriorCameraLookAction, ETriggerEvent::Completed, this, &AVehiclePawn::InteriorCameraLookReleased);
+	input->BindAction(RestartAction, ETriggerEvent::Triggered, this, &AVehiclePawn::RestartLevel);
 }
 
 
@@ -218,7 +230,7 @@ void AVehiclePawn::LookAround(const FInputActionValue& value)
 
 void AVehiclePawn::LookUpDown(const FInputActionValue& value)
 {
-	AddControllerPitchInput(value.Get<float>() / -7);
+	AddControllerPitchInput(value.Get<float>() / -10);
 }
 
 void AVehiclePawn::InteriorCameraLook()
@@ -270,14 +282,14 @@ void AVehiclePawn::TurnRearLights(bool value)
 
 void AVehiclePawn::IncreasedSmokeExhaust()
 {
-	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 350);
-	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 350);
+	ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 150);
+	ExhaustRight->SetFloatParameter(FName("SpawnRate"), 150);
 }
 
 void AVehiclePawn::DecreasedSmokeExhaust()
 {
-	NS_ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 30);
-	NS_ExhaustRight->SetFloatParameter(FName("SpawnRate"), 30);
+	ExhaustLeft->SetFloatParameter(FName("SpawnRate"), 20);
+	ExhaustRight->SetFloatParameter(FName("SpawnRate"), 20);
 }
 
 void AVehiclePawn::SwitchCamera()
@@ -339,26 +351,41 @@ void AVehiclePawn::DeactivateTrails()
 	NS_FL_Trail->Deactivate();
 }
 
+void AVehiclePawn::RestartLevel()
+{
+	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+}
+
+void AVehiclePawn::TimeUp()
+{
+	APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
+
+	if (GameMode)
+		GameMode->TimeUp(this);
+}
+
 void AVehiclePawn::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (OtherActor->GetName() == TEXT("BP_Car_C_0") || OtherActor->ActorHasTag(FName(TEXT("Track"))))
+		return;
+
 	OnTakeDamage(this, 10, nullptr, GetController(), this);
 }
 
 void AVehiclePawn::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (DamageTake == 0) 
+	
+	if (DamageTake >= 0 && DamageTake <= 3) 
 	{
 		BumperFront->SetMaterial(0, DamageMaterial);
 		HoodFront->SetMaterial(0, DamageMaterial);
-	}
-	else if (DamageTake >= 1 && DamageTake <= 3) 
-	{
 		FenderLeft->SetMaterial(0, DamageMaterial);
 		FenderRight->SetMaterial(0, DamageMaterial);
 		FenderLeft->SetMaterial(2, DamageLightMaterial);
 		FenderRight->SetMaterial(3, DamageLightMaterial);
 	}
-	else if (DamageTake > 3 && DamageTake <= 6)
+	
+	if (DamageTake > 3 && DamageTake <= 5)
 	{
 		Body->SetMaterial(0, DamageMaterial);
 		Body->SetMaterial(5, DamageWindowMaterial);
@@ -367,13 +394,24 @@ void AVehiclePawn::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamag
 		DoorLeft->SetMaterial(3, DamageWindowMaterial);
 		DoorRight->SetMaterial(3, DamageWindowMaterial);
 		Window->SetMaterial(0, DamageWindowMaterial);
+
+		if (UChaosWheeledVehicleMovementComponent* VehicleMovement = Cast<UChaosWheeledVehicleMovementComponent>(GetVehicleMovement()))
+			VehicleMovement->EngineSetup.MaxTorque = 250;
 	}
-	else if (DamageTake > 7) 
+	
+	if (DamageTake > 6) 
 	{
 		BumperRear->SetMaterial(0, DamageMaterial);
 		BumperRear->SetMaterial(2, DamageLightMaterial);
 		BootRear->SetMaterial(0, DamageMaterial);
 		SpoilerBack->SetMaterial(0, DamageMaterial);
+		APraktykiGameModeBase* GameMode = GetWorld()->GetAuthGameMode<APraktykiGameModeBase>();
+
+		if (GameMode) 
+		{
+			GameMode->DestroyedCar(this);
+			GetVehicleMovementComponent()->SetThrottleInput(0);
+		}
 	}
 
 	DamageTake++;

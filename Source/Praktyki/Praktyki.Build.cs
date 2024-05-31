@@ -8,7 +8,7 @@ public class Praktyki : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "EnhancedInput", "Core", "CoreUObject", "Engine", "InputCore", "PhysicsCore" , "Niagara"});
+		PublicDependencyModuleNames.AddRange(new string[] { "EnhancedInput", "Core", "CoreUObject", "Engine", "InputCore", "PhysicsCore" , "Niagara" , "UMG"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
